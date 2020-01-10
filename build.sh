@@ -1,6 +1,6 @@
 #!/bin/bash
-name="apollo-test"
-tag=$(date +"%m%d%H%M%S")
+name="172.24.0.28:1180/yzf-apollo/apollo-all"
+tag=1.5.1
 
 docker build -t ${name}:${tag} .
 

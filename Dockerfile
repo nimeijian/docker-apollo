@@ -10,26 +10,30 @@ ENV VERSION=1.5.1 \
     DEV_CONFIG_PORT=8080 \
     FAT_CONFIG_PORT=8081 \
     UAT_CONFIG_PORT=8082 \
-    PRO_CONFIG_PORT=8083
+    PRO_CONFIG_PORT=8083 \
+	DEV_EUREKA_URL=""    \
+	FAT_EUREKA_URL=""    \
+	UAT_EUREKA_URL=""    \
+	PRO_EUREKA_URL=""
 
-ARG APOLLO_URL=https://github.com/ctripcorp/apollo/archive/v${VERSION}.tar.gz
+ARG APOLLO_URL=http://gitlab.yzf.net/assembly/yzf-apollo/-/archive/${VERSION}/yzf-apollo-${VERSION}.tar.gz
 
 COPY docker-entrypoint /usr/local/bin/docker-entrypoint
 COPY healthcheck    /usr/local/bin/healthcheck
 
 RUN wget ${APOLLO_URL} -O apollo.tar.gz && tar -zxf apollo.tar.gz && \
-    rm apollo.tar.gz && test -e apollo-${VERSION} && \
+    rm apollo.tar.gz && test -e yzf-apollo-${VERSION} && \
     sed -e "s/db_password=/db_password=toor/g"  \
         -e "s/^dev_meta.*/dev_meta=http:\/\/localhost:${DEV_CONFIG_PORT}/" \
         -e "s/^fat_meta.*/fat_meta=http:\/\/localhost:${FAT_CONFIG_PORT}/" \
         -e "s/^uat_meta.*/uat_meta=http:\/\/localhost:${UAT_CONFIG_PORT}/" \
-        -e "s/^pro_meta.*/pro_meta=http:\/\/localhost:${PRO_CONFIG_PORT}/" -i apollo-${VERSION}/scripts/build.sh && \
-    bash apollo-${VERSION}/scripts/build.sh && rm -rf /root/.m2 && \
+        -e "s/^pro_meta.*/pro_meta=http:\/\/localhost:${PRO_CONFIG_PORT}/" -i yzf-apollo-${VERSION}/scripts/build.sh && \
+    bash yzf-apollo-${VERSION}/scripts/build.sh && rm -rf /root/.m2 && \
     mkdir /apollo-admin/dev /apollo-admin/fat /apollo-admin/uat /apollo-admin/pro /apollo-config/dev /apollo-config/fat /apollo-config/uat /apollo-config/pro /apollo-portal -p && \
-    mv apollo-${VERSION}/apollo-portal/target/apollo-portal-${VERSION}-github.zip  \
-       apollo-${VERSION}/apollo-adminservice/target/apollo-adminservice-${VERSION}-github.zip \
-       apollo-${VERSION}/apollo-configservice/target/apollo-configservice-${VERSION}-github.zip / && \
-    rm -rf apollo-${VERSION} && \
+    mv yzf-apollo-${VERSION}/apollo-portal/target/apollo-portal-${VERSION}-github.zip  \
+       yzf-apollo-${VERSION}/apollo-adminservice/target/apollo-adminservice-${VERSION}-github.zip \
+       yzf-apollo-${VERSION}/apollo-configservice/target/apollo-configservice-${VERSION}-github.zip / && \
+    rm -rf yzf-apollo-${VERSION} && \
     chmod +x /usr/local/bin/docker-entrypoint /usr/local/bin/healthcheck
 
 HEALTHCHECK --interval=5m --timeout=3s CMD bash /usr/local/bin/healthcheck
